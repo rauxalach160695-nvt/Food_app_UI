@@ -52,7 +52,12 @@ dependencies:
   location: ^5.0.0
   geocode: ^1.0.3
   flutter_rating_bar: ^4.0.1
-
+  instant: ^0.5.1
+  flutter_slidable: ^3.0.1
+  flutter_paypal_checkout: ^1.0.1
+  momo_vn: ^2.0.2
+  flutter_zalopay_sdk: ^0.1.14
+  zalo_flutter: ^0.0.6
 
 dev_dependencies:
   flutter_test:
@@ -85,6 +90,8 @@ flutter:
     - images/icon_app.png
     - images/avatar.png
     - images/xianglingcook.png
+    - images/sale.png
+    - images/foodNotFound.png
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1,11 +1,15 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:bubble/bubble.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_session_manager/flutter_session_manager.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 String randomString() {
   final random = Random.secure();
@@ -30,18 +34,66 @@ class _Chat_screenState extends State<Chat_screen> {
     )
   ];
   final _user = const types.User(id: '123');
+  late bool _isLoading;
+
+  Future<http.Response> chatBot(String userChat) async {
+    Map<String, String> headers = {
+      "Content-type": "application/json; charset=UTF-8"
+    };
+    Map jsonBody = {'sender': "thinhgnuyen", 'message': userChat};
+
+    final response = await http.post(Uri.parse("${dotenv.env['API_BOT']}"),
+        headers: headers, body: jsonEncode(jsonBody));
+    debugPrint(response.statusCode.toString());
+    if (response.statusCode == 200) {
+      var reply = jsonDecode(response.body)[0]['text'];
+      types.TextMessage botReply = new types.TextMessage(
+        author: types.User(id: '163'),
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        id: 'sdsdfsdfsdfsdfsdfsdfsdfsdfs',
+        text: reply,
+      );
+      _messages.insert(0, botReply);
+      setState(() {
+        // debugger();
+        _isLoading = false;
+      });
+    } else {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+    return response;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _isLoading = true;
+    super.initState();
+    // chatBot("chào");
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Chat(
-        messages: _messages,
-        onSendPressed: _handleSendPressed,
-        user: _user,
-        bubbleBuilder: _bubbleBuilder,
-        onAttachmentPressed: _handleImageSelection,
-      ),
-    );
+        body: SafeArea(
+            child: Container(
+                height: MediaQuery.of(context).size.height - 100,
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [Text("data"), Text("data")],
+                )))
+        // Chat(
+        //   messages: _messages,
+        //   onSendPressed: _handleSendPressed,
+        //   user: _user,
+        //   bubbleBuilder: _bubbleBuilder,
+        //   onAttachmentPressed: _handleImageSelection,
+        // ),
+        );
   }
 
   void _handleImageSelection() async {
@@ -80,7 +132,7 @@ class _Chat_screenState extends State<Chat_screen> {
         color: _user.id != message.author.id ||
                 message.type == types.MessageType.image
             ? const Color(0xfff5f5f7)
-            : const Color(0xff6f61e8),
+            : Colors.orange,
         margin: nextMessageInGroup
             ? const BubbleEdges.symmetric(horizontal: 6)
             : null,
@@ -92,9 +144,8 @@ class _Chat_screenState extends State<Chat_screen> {
       );
 
   void _addMessage(types.Message message) {
-    setState(() {
-      _messages.insert(0, message);
-    });
+    _messages.insert(0, message);
+    setState(() {});
   }
 
   void _handleSendPressed(types.PartialText message) {
@@ -106,6 +157,7 @@ class _Chat_screenState extends State<Chat_screen> {
     );
 
     _addMessage(textMessage);
+    chatBot(message.text);
     debugPrint(_messages.toString());
   }
 }

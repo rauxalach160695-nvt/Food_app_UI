@@ -33,7 +33,6 @@ class _NavigationState extends State<Navigation> {
   final List<Widget> _pages = [
     Home(),
     Cart(),
-    Order(),
     Profile(),
     Chat_screen(),
   ];
@@ -68,10 +67,6 @@ class _NavigationState extends State<Navigation> {
                   GButton(
                     icon: Icons.shopping_cart,
                     text: 'Giỏ hàng',
-                  ),
-                  GButton(
-                    icon: Icons.assignment,
-                    text: 'Đơn mua',
                   ),
                   GButton(
                     icon: Icons.person,

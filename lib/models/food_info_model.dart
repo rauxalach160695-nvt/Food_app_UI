@@ -1,13 +1,13 @@
 class FoodInfo {
   String? sId;
   String? foodName;
-  int? price;
+  num? price;
   List<String>? foodType;
   String? image;
   String? description;
   num? rate;
   int? iV;
-  List<State>? state;
+  List<FoodInfoState>? foodInfoState;
 
   FoodInfo(
       {this.sId,
@@ -18,7 +18,7 @@ class FoodInfo {
       this.description,
       this.rate,
       this.iV,
-      this.state});
+      this.foodInfoState});
 
   FoodInfo.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
@@ -29,10 +29,10 @@ class FoodInfo {
     description = json['description'];
     rate = json['rate'];
     iV = json['__v'];
-    if (json['state'] != null) {
-      state = <State>[];
-      json['state'].forEach((v) {
-        state!.add(new State.fromJson(v));
+    if (json['foodInfoState'] != null) {
+      foodInfoState = <FoodInfoState>[];
+      json['foodInfoState'].forEach((v) {
+        foodInfoState!.add(new FoodInfoState.fromJson(v));
       });
     }
   }
@@ -47,23 +47,25 @@ class FoodInfo {
     data['description'] = this.description;
     data['rate'] = this.rate;
     data['__v'] = this.iV;
-    if (this.state != null) {
-      data['state'] = this.state!.map((v) => v.toJson()).toList();
+    if (this.foodInfoState != null) {
+      data['foodInfoState'] =
+          this.foodInfoState!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
-class State {
+class FoodInfoState {
   String? sId;
   int? quantity;
   int? foodDiscount;
   String? foodId;
   int? iV;
 
-  State({this.sId, this.quantity, this.foodDiscount, this.foodId, this.iV});
+  FoodInfoState(
+      {this.sId, this.quantity, this.foodDiscount, this.foodId, this.iV});
 
-  State.fromJson(Map<String, dynamic> json) {
+  FoodInfoState.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
     quantity = json['quantity'];
     foodDiscount = json['foodDiscount'];

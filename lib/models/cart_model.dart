@@ -26,7 +26,7 @@ class Cart {
   String? name;
   int? quantity;
   String? image;
-  double? price;
+  num? price;
   List<String>? type;
   String? idcart;
 

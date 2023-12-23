@@ -9,7 +9,7 @@ import '../models/food_model.dart';
 import '../models/food_info_model.dart' as predix;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:food_app/models/food_model.dart';
+import 'package:food_app/models/food_info_model.dart';
 import 'package:food_app/models/rate_model.dart';
 import 'package:food_app/screen/food_detail.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
@@ -18,10 +18,10 @@ import 'package:intl/intl.dart';
 class Review extends StatefulWidget {
   const Review({
     super.key,
-    required this.foodId,
+    required this.foodInfo,
   });
 
-  final String foodId;
+  final FoodInfo foodInfo;
 
   @override
   State<Review> createState() => _ReviewState();
@@ -67,7 +67,7 @@ class _ReviewState extends State<Review> {
     // TODO: implement initState
     super.initState();
     _isLoading = true;
-    getFoodRate(widget.foodId);
+    getFoodRate(widget.foodInfo.sId.toString());
   }
 
   @override
@@ -135,7 +135,7 @@ class _ReviewState extends State<Review> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => Rating(
-                                  foodId: widget.foodId,
+                                  foodInfo: widget.foodInfo,
                                 )),
                       );
                     },

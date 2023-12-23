@@ -145,6 +145,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.5"
+  eventify:
+    dependency: transitive
+    description:
+      name: eventify
+      sha256: b829429f08586cc2001c628e7499e3e3c2493a1d895fd73b00ecb23351aa5a66
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   fake_async:
     dependency: transitive
     description:
@@ -238,6 +246,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.0"
+  flutter_inappwebview:
+    dependency: transitive
+    description:
+      name: flutter_inappwebview
+      sha256: d198297060d116b94048301ee6749cd2e7d03c1f2689783f52d210a6b7aba350
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.8.0"
   flutter_link_previewer:
     dependency: transitive
     description:
@@ -270,6 +286,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.1"
+  flutter_paypal_checkout:
+    dependency: "direct main"
+    description:
+      name: flutter_paypal_checkout
+      sha256: "5cc8bd4e67acb9befbbc935a0f2d4d468ddb8e5120a24ad21ed7518b44b47b2e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -294,6 +318,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.3"
+  flutter_slidable:
+    dependency: "direct main"
+    description:
+      name: flutter_slidable
+      sha256: "19ed4813003a6ff4e9c6bcce37e792a2a358919d7603b2b31ff200229191e44c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.1"
   flutter_spinkit:
     dependency: "direct main"
     description:
@@ -312,6 +344,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_zalopay_sdk:
+    dependency: "direct main"
+    description:
+      name: flutter_zalopay_sdk
+      sha256: b93a57c770197e985b5fd0c0af2ba6034f5a11215948eaff369f29ffcb20b8e8
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.14"
   geocode:
     dependency: "direct main"
     description:
@@ -424,6 +464,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.1+1"
+  instant:
+    dependency: "direct main"
+    description:
+      name: instant
+      sha256: "9fc99ef29d2c82834f13e129db12324af24ed91e43949576190f57bc1b6670c2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.1"
   intl:
     dependency: "direct main"
     description:
@@ -536,6 +584,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  momo_vn:
+    dependency: "direct main"
+    description:
+      name: momo_vn
+      sha256: "448ca04e97cc38a257e6ced414a732de4c9806478bacf3894515ae2b66c6cac2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   mongo_dart:
     dependency: "direct main"
     description:
@@ -965,6 +1021,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.3.0"
+  zalo_flutter:
+    dependency: "direct main"
+    description:
+      name: zalo_flutter
+      sha256: bfb26084392f35389bf02cb7f84380fe39512caf32e5a5a12b444989b780b643
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.6"
 sdks:
   dart: ">=3.1.0 <4.0.0"
   flutter: ">=3.13.0"

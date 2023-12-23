@@ -2,15 +2,18 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:food_app/models/food_model.dart';
+import 'package:food_app/models/user_info_model.dart';
 import 'package:food_app/screen/food_detail.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
 import 'package:food_app/screen/search.dart';
 import 'package:http/http.dart' as http;
 import '../models/food_model.dart';
-import '../models/food_info_model.dart' as predix;
+import '../models/food_info_model.dart';
+import 'package:food_app/screen/loading_page.dart' as ld;
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -20,9 +23,10 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with TickerProviderStateMixin {
-  List<predix.FoodInfo> foods = [];
+  List<FoodInfo> foods = [];
   TextEditingController _searchController = new TextEditingController();
   late bool _isLoading;
+  late User_Info userInfo = new User_Info();
   String userName = '';
 
   Future<http.Response> getFoodByType() async {
@@ -43,11 +47,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         debugPrint('chay day roi ');
         List<dynamic> rawFood = jsonDecode(response.body);
         // foods = rawFood.map((food) => Food.fromJson(food)).toList();
-        foods = rawFood.map((food) => predix.FoodInfo.fromJson(food)).toList();
+        foods = rawFood.map((food) => FoodInfo.fromJson(food)).toList();
         debugPrint(foods[1].image.toString());
-        for (predix.FoodInfo eachFood in foods) {
+        for (FoodInfo eachFood in foods) {
           eachFood.price = (eachFood.price! -
-                  eachFood.price! * eachFood.state![0].foodDiscount! / 100)
+                  eachFood.price! *
+                      eachFood.foodInfoState![0].foodDiscount! /
+                      100)
               .round() as int?;
         }
         foods.sort((a, b) => a.price!.compareTo(b.price!));
@@ -72,18 +78,20 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     };
 
     final response = await http.post(
-        Uri.parse("${dotenv.env['API_HOST']}/user/getUserName"),
+        Uri.parse("${dotenv.env['API_HOST']}/user/getUserInfo"),
         headers: headers,
         body: jsonEncode(jsonBody));
     debugPrint(response.statusCode.toString());
     if (response.statusCode == 200) {
       setState(() {
-        userName = json.decode(response.body)["userName"];
+        var jsonData = jsonDecode(response.body);
+        userInfo = User_Info.fromJson(jsonData[0]);
+
+        userName = userInfo.userName!;
         _isLoading = false;
       });
     } else {
       setState(() {
-        debugPrint('run 111');
         _isLoading = true;
       });
     }
@@ -102,7 +110,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     TabController _tabController = TabController(vsync: this, length: 4);
     return _isLoading
-        ? LoadingPage()
+        ? ld.LoadingPage()
         : Scaffold(
             backgroundColor: Colors.white,
             body: SingleChildScrollView(
@@ -225,7 +233,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     ),
                   ),
                   Container(
-                    height: 400,
+                    height: MediaQuery.of(context).size.height - 396,
                     width: double.infinity,
                     child: TabBarView(
                       controller: _tabController,
@@ -244,8 +252,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            Food_detail(foodId: foods[i].sId!)),
+                                        builder: (context) => Food_detail(
+                                              foodInfo: foods[i],
+                                            )),
                                   );
                                 },
                                 child: Container(
@@ -291,34 +300,56 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                             const SizedBox(
                                               height: 65,
                                             ),
-                                            Container(
-                                                height: 20,
-                                                width: 50,
-                                                margin: EdgeInsets.only(
-                                                    left: 10, top: 10),
-                                                padding: EdgeInsets.fromLTRB(
-                                                    5, 0, 5, 0),
-                                                decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50)),
-                                                child: Row(
-                                                  children: [
-                                                    Text(
-                                                      foods[i].rate.toString(),
-                                                      style: TextStyle(
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    Icon(
-                                                      Icons.star,
-                                                      color: Colors.yellow,
-                                                      size: 15,
-                                                    )
-                                                  ],
-                                                ))
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Container(
+                                                    height: 20,
+                                                    width: 50,
+                                                    margin: EdgeInsets.only(
+                                                        left: 10, top: 10),
+                                                    padding:
+                                                        EdgeInsets.fromLTRB(
+                                                            5, 0, 5, 0),
+                                                    decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50)),
+                                                    child: Row(
+                                                      children: [
+                                                        Text(
+                                                          foods[i]
+                                                              .rate
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                              fontSize: 15,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                        Icon(
+                                                          Icons.star,
+                                                          color: Colors.yellow,
+                                                          size: 15,
+                                                        )
+                                                      ],
+                                                    )),
+                                                Container(
+                                                  height: 30,
+                                                  child: (foods[i]
+                                                              .foodInfoState![0]
+                                                              .foodDiscount ==
+                                                          0)
+                                                      ? Text("")
+                                                      : Image(
+                                                          image: AssetImage(
+                                                              "images/sale.png")),
+                                                )
+                                              ],
+                                            )
                                           ],
                                         )),
                                     Container(
@@ -387,8 +418,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            Food_detail(foodId: foods[i].sId!)),
+                                        builder: (context) => Food_detail(
+                                              foodInfo: foods[i],
+                                            )),
                                   );
                                 },
                                 child: Container(
@@ -530,8 +562,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            Food_detail(foodId: foods[i].sId!)),
+                                        builder: (context) => Food_detail(
+                                              foodInfo: foods[i],
+                                            )),
                                   );
                                 },
                                 child: Container(
@@ -673,8 +706,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            Food_detail(foodId: foods[i].sId!)),
+                                        builder: (context) => Food_detail(
+                                              foodInfo: foods[i],
+                                            )),
                                   );
                                 },
                                 child: Container(
@@ -809,21 +843,5 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               )),
             ),
           );
-  }
-}
-
-class LoadingPage extends StatelessWidget {
-  const LoadingPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-          child: SpinKitWave(
-        color: Colors.orange,
-        size: 40,
-      )),
-    );
   }
 }

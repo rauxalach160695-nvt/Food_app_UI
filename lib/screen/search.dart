@@ -10,6 +10,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:food_app/models/food_model.dart';
 import 'package:food_app/screen/food_detail.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
+import '../models/user_info_model.dart';
 
 class Search extends StatefulWidget {
   const Search({super.key, required this.keyword});
@@ -47,7 +48,9 @@ class _SearchState extends State<Search> {
         foods = rawFood.map((food) => predix.FoodInfo.fromJson(food)).toList();
         for (predix.FoodInfo eachFood in foods) {
           eachFood.price = (eachFood.price! -
-                  eachFood.price! * eachFood.state![0].foodDiscount! / 100)
+                  eachFood.price! *
+                      eachFood.foodInfoState![0].foodDiscount! /
+                      100)
               .round() as int?;
         }
         _isLoading = false;
@@ -213,8 +216,9 @@ class _SearchState extends State<Search> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        Food_detail(foodId: foods[i].sId!)),
+                                    builder: (context) => Food_detail(
+                                          foodInfo: foods[i],
+                                        )),
                               );
                             },
                             child: Container(

@@ -318,7 +318,7 @@ class _SignupState extends State<Signup> {
 
   void onSignupClick() {
     setState(() {
-      if (_userController.text.length > 15 ||
+      if (_userController.text.length > 20 ||
           _phoneController.text.length != 10 ||
           _phoneController.text.contains(" ") ||
           _passController.text.contains(" ") ||

@@ -7,15 +7,15 @@ import 'dart:developer';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '../models/food_model.dart';
+import '../models/food_info_model.dart';
 
 class Rating extends StatefulWidget {
   const Rating({
     super.key,
-    required this.foodId,
+    required this.foodInfo,
   });
 
-  final String foodId;
+  final FoodInfo foodInfo;
 
   @override
   State<Rating> createState() => _RatingState();
@@ -23,7 +23,7 @@ class Rating extends StatefulWidget {
 
 class _RatingState extends State<Rating> {
   late bool _isLoading;
-  late Food foodSelected;
+  // late Food foodSelected;
   List<String> emojiText = [
     "Dở tệ",
     "Chưa ngon",
@@ -34,32 +34,32 @@ class _RatingState extends State<Rating> {
   num yourRating = 3;
   TextEditingController _ratingController = new TextEditingController();
 
-  Future<http.Response> getFoodInfo(String id) async {
-    Map<String, String> headers = {
-      "Content-type": "application/json; charset=UTF-8"
-    };
-    Map<String, String> jsonBody = {
-      'foodId': id,
-    };
+  // Future<http.Response> getFoodInfo(String id) async {
+  //   Map<String, String> headers = {
+  //     "Content-type": "application/json; charset=UTF-8"
+  //   };
+  //   Map<String, String> jsonBody = {
+  //     'foodId': id,
+  //   };
 
-    final response = await http.post(
-        Uri.parse("${dotenv.env['API_HOST']}/food/viewFood"),
-        headers: headers,
-        body: jsonEncode(jsonBody));
-    debugPrint(response.statusCode.toString());
-    if (response.statusCode == 200) {
-      setState(() {
-        var jsoncode = jsonDecode(response.body) as Map<String, dynamic>;
-        foodSelected = Food.fromJson(jsoncode);
-        _isLoading = false;
-      });
-    } else {
-      setState(() {
-        _isLoading = true;
-      });
-    }
-    return response;
-  }
+  //   final response = await http.post(
+  //       Uri.parse("${dotenv.env['API_HOST']}/food/viewFood"),
+  //       headers: headers,
+  //       body: jsonEncode(jsonBody));
+  //   debugPrint(response.statusCode.toString());
+  //   if (response.statusCode == 200) {
+  //     setState(() {
+  //       var jsoncode = jsonDecode(response.body) as Map<String, dynamic>;
+  //       foodSelected = Food.fromJson(jsoncode);
+  //       _isLoading = false;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //   }
+  //   return response;
+  // }
 
   Future<http.Response> sendRating(String foodId) async {
     Map<String, String> headers = {
@@ -86,7 +86,6 @@ class _RatingState extends State<Rating> {
       });
     } else {
       setState(() {
-        debugPrint('run 111');
         _isLoading = true;
       });
     }
@@ -97,8 +96,8 @@ class _RatingState extends State<Rating> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _isLoading = true;
-    getFoodInfo(widget.foodId);
+    _isLoading = false;
+    // getFoodInfo(widget.foodId);
   }
 
   @override
@@ -119,7 +118,7 @@ class _RatingState extends State<Rating> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           image: DecorationImage(
-                              image: NetworkImage(foodSelected.image!),
+                              image: NetworkImage(widget.foodInfo.image!),
                               fit: BoxFit.fitWidth)),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,7 +162,7 @@ class _RatingState extends State<Rating> {
                     Container(
                       margin: EdgeInsets.only(left: 15),
                       child: Text(
-                        foodSelected.foodName!,
+                        widget.foodInfo.foodName!,
                         style: TextStyle(
                             fontSize: 30, fontWeight: FontWeight.bold),
                       ),
@@ -180,7 +179,7 @@ class _RatingState extends State<Rating> {
                           width: 5,
                         ),
                         Text(
-                          foodSelected.rate!.toString(),
+                          widget.foodInfo.rate!.toString(),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ]),
@@ -191,6 +190,7 @@ class _RatingState extends State<Rating> {
                           child: Divider(
                             color: Colors.orange,
                             height: 20,
+                            thickness: 1,
                           )),
                     ),
                     SizedBox(
@@ -273,7 +273,7 @@ class _RatingState extends State<Rating> {
                                       borderRadius: BorderRadius.circular(50),
                                       side: BorderSide(color: Colors.orange)))),
                           onPressed: () {
-                            sendRating(widget.foodId);
+                            sendRating(widget.foodInfo.sId!);
                           },
                           child: Center(
                               child: Text(
