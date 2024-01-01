@@ -77,6 +77,11 @@ class _EditProfileState extends State<EditProfile> {
 
     if (response.statusCode == 200) {
       setState(() {
+        final snackBar = SnackBar(
+          content: const Text('Thay đổi mật khẩu thành công'),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -84,9 +89,27 @@ class _EditProfileState extends State<EditProfile> {
         _isLoading = false;
       });
     } else {
-      setState(() {
-        _isLoading = true;
-      });
+      if (response.statusCode == 400) {
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.of(context).pop();
+        final snackBar = SnackBar(
+          content: const Text('Mật khẩu hiện tại không đúng'),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      } else {
+        Navigator.of(context).pop();
+        final snackBar = SnackBar(
+          content: const Text('Lỗi hệ thống thử lại sau'),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
     return response;
   }
@@ -104,6 +127,16 @@ class _EditProfileState extends State<EditProfile> {
     return _isLoading
         ? const ld.LoadingPage()
         : Scaffold(
+            floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.orange,
+                child: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Navigation(selectedIndex: 1)));
+                }),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             backgroundColor: Colors.white,
             body: SingleChildScrollView(
               child: Container(
@@ -168,7 +201,8 @@ class _EditProfileState extends State<EditProfile> {
                                   spreadRadius: 1.0),
                             ],
                             image: DecorationImage(
-                                image: AssetImage('images/avatar.png'),
+                                image: AssetImage(
+                                    'images/avatar_${widget.userInfo.avatarNum}.jpg'),
                                 fit: BoxFit.fitWidth),
                           )),
                     ),
@@ -488,7 +522,12 @@ class _EditProfileState extends State<EditProfile> {
                       if (_newPassController.text == _cfPassController.text) {
                         changeUserPass();
                       } else {
-                        debugPrint("hai mat khau khong giong nhau");
+                        final snackBar = SnackBar(
+                          content: const Text(
+                              'Mật khẩu mới và mật khẩu xác nhận không giống nhau'),
+                        );
+
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                     },
                   ),

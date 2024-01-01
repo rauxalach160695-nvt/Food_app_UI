@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:food_app/screen/food_detail.dart';
+import 'package:food_app/screen/nav_screen.dart';
 import 'package:food_app/screen/review.dart';
 import 'dart:convert';
 import 'dart:developer';
@@ -82,10 +84,18 @@ class _RatingState extends State<Rating> {
         yourRating = 3;
         _ratingController.text = '';
         _isLoading = false;
-        Navigator.pop(context);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Food_detail(foodInfo: widget.foodInfo)));
       });
     } else {
       setState(() {
+        final snackBar = SnackBar(
+          content: const Text('Đánh giá món ăn không thành công'),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         _isLoading = true;
       });
     }
@@ -105,6 +115,16 @@ class _RatingState extends State<Rating> {
     return _isLoading
         ? LoadingPage()
         : Scaffold(
+            floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.orange,
+                child: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Navigation(selectedIndex: 1)));
+                }),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             backgroundColor: Colors.white,
             body: SingleChildScrollView(
               child: SafeArea(

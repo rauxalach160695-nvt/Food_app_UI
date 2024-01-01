@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:food_app/screen/food_detail.dart';
+import 'package:food_app/screen/nav_screen.dart';
 import 'package:http/http.dart' as http;
 import '../models/food_model.dart';
 import '../models/food_info_model.dart' as predix;
@@ -44,7 +45,8 @@ class _SearchState extends State<Search> {
     debugPrint(response.statusCode.toString());
     if (response.statusCode == 200) {
       setState(() {
-        List<dynamic> rawFood = jsonDecode(response.body)["findFood"];
+        // List<dynamic> rawFood = jsonDecode(response.body)["findFood"];
+        List<dynamic> rawFood = jsonDecode(response.body);
         foods = rawFood.map((food) => predix.FoodInfo.fromJson(food)).toList();
         for (predix.FoodInfo eachFood in foods) {
           eachFood.price = (eachFood.price! -
@@ -78,6 +80,16 @@ class _SearchState extends State<Search> {
     return _isLoading
         ? LoadingPage()
         : Scaffold(
+            floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.orange,
+                child: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Navigation(selectedIndex: 1)));
+                }),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             backgroundColor: Colors.white,
             body: SafeArea(
                 child: SingleChildScrollView(

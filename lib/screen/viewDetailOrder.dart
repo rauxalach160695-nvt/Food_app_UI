@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:food_app/screen/nav_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import "../models/order_model.dart";
@@ -132,6 +133,16 @@ class _ViewDetailOrderState extends State<ViewDetailOrder> {
     return _isLoading
         ? ld.LoadingPage()
         : Scaffold(
+            floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.orange,
+                child: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Navigation(selectedIndex: 1)));
+                }),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             backgroundColor: Colors.white,
             body: SafeArea(
               child: SingleChildScrollView(

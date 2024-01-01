@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:food_app/screen/home.dart';
+import 'package:food_app/screen/nav_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:localstorage/localstorage.dart';
 import 'package:food_app/screen/review.dart';
@@ -146,6 +148,16 @@ class _Food_detailState extends State<Food_detail> {
         ? LoadingPage()
         : Scaffold(
             backgroundColor: Colors.white,
+            floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.orange,
+                child: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Navigation(selectedIndex: 1)));
+                }),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             body: SingleChildScrollView(
               child: SafeArea(
                 child: Column(
@@ -183,7 +195,12 @@ class _Food_detailState extends State<Food_detail> {
                                               color: Color.fromARGB(
                                                   255, 255, 255, 255))))),
                               onPressed: () {
-                                Navigator.pop(context);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Navigation(
+                                              selectedIndex: 0,
+                                            )));
                               },
                               child: const Center(
                                   child: Icon(
@@ -407,6 +424,12 @@ class _Food_detailState extends State<Food_detail> {
                                 widget.foodInfo.image!,
                                 widget.foodInfo.price!,
                                 widget.foodInfo.foodType!);
+                            final snackBar = SnackBar(
+                              content: const Text('Đã thêm vào giỏ'),
+                            );
+
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
                           },
                           child: Center(
                               child: Text(

@@ -9,6 +9,7 @@ import 'package:food_app/models/food_model.dart';
 import 'package:food_app/models/user_info_model.dart';
 import 'package:food_app/screen/food_detail.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
+import 'package:food_app/screen/nav_screen.dart';
 import 'package:food_app/screen/search.dart';
 import 'package:http/http.dart' as http;
 import '../models/food_model.dart';
@@ -24,37 +25,63 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with TickerProviderStateMixin {
   List<FoodInfo> foods = [];
+  List<FoodInfo> riceFood = [];
+  List<FoodInfo> noodleFood = [];
+  List<FoodInfo> snackFood = [];
+  List<FoodInfo> drinkFood = [];
   TextEditingController _searchController = new TextEditingController();
   late bool _isLoading;
   late User_Info userInfo = new User_Info();
   String userName = '';
 
   Future<http.Response> getFoodByType() async {
+    _isLoading = true;
     Map<String, String> headers = {
       "Content-type": "application/json; charset=UTF-8"
     };
-    Map<String, String> jsonBody = {
-      'keyword': "cơm",
-    };
 
-    final response = await http.post(
-        Uri.parse("${dotenv.env['API_HOST']}/search/searchByType"),
-        headers: headers,
-        body: jsonEncode(jsonBody));
+    final response = await http.get(
+      Uri.parse("${dotenv.env['API_HOST']}/search/searchAllFood"),
+      headers: headers,
+    );
     debugPrint(response.statusCode.toString());
     if (response.statusCode == 200) {
       setState(() {
         debugPrint('chay day roi ');
-        List<dynamic> rawFood = jsonDecode(response.body);
+        var rawFood = jsonDecode(response.body);
         // foods = rawFood.map((food) => Food.fromJson(food)).toList();
-        foods = rawFood.map((food) => FoodInfo.fromJson(food)).toList();
-        debugPrint(foods[1].image.toString());
+        FoodInfo oneFood = FoodInfo.fromJson(rawFood[1]);
+
+        for (dynamic eachFood in rawFood) {
+          foods.add(FoodInfo.fromJson(eachFood));
+        }
+        // foods = rawFood.map((food) => FoodInfo.fromJson(food)).toList();
         for (FoodInfo eachFood in foods) {
           eachFood.price = (eachFood.price! -
                   eachFood.price! *
                       eachFood.foodInfoState![0].foodDiscount! /
                       100)
               .round() as int?;
+        }
+        for (FoodInfo eachFood in foods) {
+          if (eachFood.foodType!.contains("cơm")) {
+            riceFood.add(eachFood);
+          }
+        }
+        for (FoodInfo eachFood in foods) {
+          if (eachFood.foodType!.contains("món nước")) {
+            noodleFood.add(eachFood);
+          }
+        }
+        for (FoodInfo eachFood in foods) {
+          if (eachFood.foodType!.contains("ăn vặt")) {
+            snackFood.add(eachFood);
+          }
+        }
+        for (FoodInfo eachFood in foods) {
+          if (eachFood.foodType!.contains("đồ uống")) {
+            drinkFood.add(eachFood);
+          }
         }
         foods.sort((a, b) => a.price!.compareTo(b.price!));
         _isLoading = false;
@@ -88,7 +115,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         userInfo = User_Info.fromJson(jsonData[0]);
 
         userName = userInfo.userName!;
-        _isLoading = false;
+        SessionManager().set("info", userInfo);
       });
     } else {
       setState(() {
@@ -101,8 +128,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   @override
   void initState() {
     _isLoading = true;
-    getFoodByType().then((value) => null);
-    getUserName();
+    getUserName().then((value) => null);
+    getFoodByType();
     super.initState();
   }
 
@@ -112,6 +139,16 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     return _isLoading
         ? ld.LoadingPage()
         : Scaffold(
+            floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.orange,
+                child: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Navigation(selectedIndex: 1)));
+                }),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             backgroundColor: Colors.white,
             body: SingleChildScrollView(
               child: SafeArea(
@@ -224,7 +261,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                           text: "Món nước",
                         ),
                         Tab(
-                          text: "Đồ ngọt",
+                          text: "Ăn vặt",
                         ),
                         Tab(
                           text: "Đồ uống",
@@ -246,14 +283,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                           mainAxisSpacing: 5,
                           crossAxisCount: 2,
                           children: <Widget>[
-                            for (var i = 0; i < foods.length; i++)
+                            for (var i = 0; i < 6; i++)
                               InkWell(
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => Food_detail(
-                                              foodInfo: foods[i],
+                                              foodInfo: riceFood[i],
                                             )),
                                   );
                                 },
@@ -271,8 +308,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                             // color: Color.fromARGB(255, 255, 0, 0)
                                             // .withOpacity(0.5),
                                             image: DecorationImage(
-                                              image:
-                                                  NetworkImage(foods[i].image!),
+                                              image: NetworkImage(
+                                                  riceFood[i].image!),
                                               fit: BoxFit.fitWidth,
                                             )),
                                         child: Column(
@@ -291,7 +328,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                         BorderRadius.circular(
                                                             10)),
                                                 child: Text(
-                                                  "${(foods[i].price!).toStringAsFixed(3)}đ",
+                                                  "${(riceFood[i].price!).toStringAsFixed(3)}đ",
                                                   style: TextStyle(
                                                       fontSize: 15,
                                                       fontWeight:
@@ -321,7 +358,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                     child: Row(
                                                       children: [
                                                         Text(
-                                                          foods[i]
+                                                          riceFood[i]
                                                               .rate
                                                               .toString(),
                                                           style: TextStyle(
@@ -339,7 +376,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                     )),
                                                 Container(
                                                   height: 30,
-                                                  child: (foods[i]
+                                                  child: (riceFood[i]
                                                               .foodInfoState![0]
                                                               .foodDiscount ==
                                                           0)
@@ -378,7 +415,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              foods[i].foodName!.toString(),
+                                              riceFood[i].foodName!.toString(),
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold),
                                             ),
@@ -386,7 +423,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                               height: 5,
                                             ),
                                             Text(
-                                              foods[i].description!.toString(),
+                                              riceFood[i]
+                                                  .description!
+                                                  .toString(),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
@@ -412,14 +451,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                           mainAxisSpacing: 5,
                           crossAxisCount: 2,
                           children: <Widget>[
-                            for (var i = 0; i < foods.length; i++)
+                            for (var i = 0; i < 6; i++)
                               InkWell(
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => Food_detail(
-                                              foodInfo: foods[i],
+                                              foodInfo: noodleFood[i],
                                             )),
                                   );
                                 },
@@ -437,8 +476,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                             // color: Color.fromARGB(255, 255, 0, 0)
                                             // .withOpacity(0.5),
                                             image: DecorationImage(
-                                              image:
-                                                  NetworkImage(foods[i].image!),
+                                              image: NetworkImage(
+                                                  noodleFood[i].image!),
                                               fit: BoxFit.fitWidth,
                                             )),
                                         child: Column(
@@ -457,7 +496,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                         BorderRadius.circular(
                                                             10)),
                                                 child: Text(
-                                                  foods[i].price!.toString() +
+                                                  noodleFood[i]
+                                                          .price!
+                                                          .toString() +
                                                       ".000đ",
                                                   style: TextStyle(
                                                       fontSize: 15,
@@ -482,7 +523,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                 child: Row(
                                                   children: [
                                                     Text(
-                                                      foods[i].rate.toString(),
+                                                      noodleFood[i]
+                                                          .rate
+                                                          .toString(),
                                                       style: TextStyle(
                                                           fontSize: 15,
                                                           fontWeight:
@@ -523,7 +566,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              foods[i].foodName!.toString(),
+                                              noodleFood[i]
+                                                  .foodName!
+                                                  .toString(),
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold),
                                             ),
@@ -531,7 +576,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                               height: 5,
                                             ),
                                             Text(
-                                              foods[i].description!.toString(),
+                                              noodleFood[i]
+                                                  .description!
+                                                  .toString(),
                                               maxLines: 1,
                                               style: const TextStyle(
                                                   color: Colors.grey,
@@ -556,14 +603,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                           mainAxisSpacing: 5,
                           crossAxisCount: 2,
                           children: <Widget>[
-                            for (var i = 0; i < foods.length; i++)
+                            for (var i = 0; i < 6; i++)
                               InkWell(
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => Food_detail(
-                                              foodInfo: foods[i],
+                                              foodInfo: snackFood[i],
                                             )),
                                   );
                                 },
@@ -581,8 +628,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                             // color: Color.fromARGB(255, 255, 0, 0)
                                             // .withOpacity(0.5),
                                             image: DecorationImage(
-                                              image:
-                                                  NetworkImage(foods[i].image!),
+                                              image: NetworkImage(
+                                                  snackFood[i].image!),
                                               fit: BoxFit.fitWidth,
                                             )),
                                         child: Column(
@@ -601,7 +648,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                         BorderRadius.circular(
                                                             10)),
                                                 child: Text(
-                                                  foods[i].price!.toString() +
+                                                  snackFood[i]
+                                                          .price!
+                                                          .toString() +
                                                       ".000đ",
                                                   style: TextStyle(
                                                       fontSize: 15,
@@ -626,7 +675,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                 child: Row(
                                                   children: [
                                                     Text(
-                                                      foods[i].rate.toString(),
+                                                      snackFood[i]
+                                                          .rate
+                                                          .toString(),
                                                       style: TextStyle(
                                                           fontSize: 15,
                                                           fontWeight:
@@ -667,7 +718,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              foods[i].foodName!.toString(),
+                                              snackFood[i].foodName!.toString(),
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold),
                                             ),
@@ -675,7 +726,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                               height: 5,
                                             ),
                                             Text(
-                                              foods[i].description!.toString(),
+                                              snackFood[i]
+                                                  .description!
+                                                  .toString(),
                                               maxLines: 1,
                                               style: const TextStyle(
                                                   color: Colors.grey,
@@ -700,14 +753,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                           mainAxisSpacing: 5,
                           crossAxisCount: 2,
                           children: <Widget>[
-                            for (var i = 0; i < foods.length; i++)
+                            for (var i = 0; i < 6; i++)
                               InkWell(
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => Food_detail(
-                                              foodInfo: foods[i],
+                                              foodInfo: drinkFood[i],
                                             )),
                                   );
                                 },
@@ -725,8 +778,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                             // color: Color.fromARGB(255, 255, 0, 0)
                                             // .withOpacity(0.5),
                                             image: DecorationImage(
-                                              image:
-                                                  NetworkImage(foods[i].image!),
+                                              image: NetworkImage(
+                                                  drinkFood[i].image!),
                                               fit: BoxFit.fitWidth,
                                             )),
                                         child: Column(
@@ -745,7 +798,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                         BorderRadius.circular(
                                                             10)),
                                                 child: Text(
-                                                  foods[i].price!.toString() +
+                                                  drinkFood[i]
+                                                          .price!
+                                                          .toString() +
                                                       ".000đ",
                                                   style: TextStyle(
                                                       fontSize: 15,
@@ -770,7 +825,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                 child: Row(
                                                   children: [
                                                     Text(
-                                                      foods[i].rate.toString(),
+                                                      drinkFood[i]
+                                                          .rate
+                                                          .toString(),
                                                       style: TextStyle(
                                                           fontSize: 15,
                                                           fontWeight:
@@ -811,7 +868,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              foods[i].foodName!.toString(),
+                                              drinkFood[i].foodName!.toString(),
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold),
                                             ),
@@ -819,7 +876,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                               height: 5,
                                             ),
                                             Text(
-                                              foods[i].description!.toString(),
+                                              drinkFood[i]
+                                                  .description!
+                                                  .toString(),
                                               maxLines: 1,
                                               style: const TextStyle(
                                                   color: Colors.grey,

@@ -8,7 +8,7 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:bubble/bubble.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_paypal_checkout/flutter_paypal_checkout.dart';
+// import 'package:flutter_paypal_checkout/flutter_paypal_checkout.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
 import 'package:food_app/models/cart_model.dart';
 import 'package:food_app/screen/home.dart';
@@ -19,7 +19,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:momo_vn/momo_vn.dart';
 import 'package:flutter/services.dart';
-import 'package:zalo_flutter/zalo_flutter.dart';
+// import 'package:zalo_flutter/zalo_flutter.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
 
 class CheckoutPage extends StatefulWidget {

@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
 import 'package:food_app/models/food_info_model.dart';
 import 'package:food_app/screen/food_detail.dart';
+import 'package:food_app/screen/nav_screen.dart';
 import '../models/user_info_model.dart';
 import 'package:food_app/screen/loading_page.dart' as ld;
 import 'package:http/http.dart' as http;
@@ -106,6 +107,16 @@ class _FavoriteState extends State<Favorite> {
     return _isLoading
         ? ld.LoadingPage()
         : Scaffold(
+            floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.orange,
+                child: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Navigation(selectedIndex: 1)));
+                }),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             backgroundColor: Colors.white,
             body: SafeArea(
               child: Column(
@@ -147,7 +158,7 @@ class _FavoriteState extends State<Favorite> {
                           child: Container(
                             padding: EdgeInsets.only(right: 50),
                             child: Text(
-                              "Đơn Hàng",
+                              "Món Ghiền",
                               style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -198,13 +209,13 @@ class _FavoriteState extends State<Favorite> {
                                   i++)
                                 InkWell(
                                   onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => Food_detail(
-                                                foodInfo: foods[i],
-                                              )),
-                                    );
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //       builder: (context) => Food_detail(
+                                    //             foodInfo: foods[i],
+                                    //           )),
+                                    // );
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.all(8),

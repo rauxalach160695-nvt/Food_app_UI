@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:food_app/models/user_info_model.dart';
 import 'package:food_app/screen/food_detail.dart';
+import 'package:food_app/screen/nav_screen.dart';
 import 'package:food_app/screen/rating.dart';
 import 'package:http/http.dart' as http;
 import '../models/food_model.dart';
@@ -30,6 +32,7 @@ class Review extends StatefulWidget {
 class _ReviewState extends State<Review> {
   late bool _isLoading;
   List<Rate> listRating = [];
+  User_Info userInfo = new User_Info();
 
   Future<http.Response> getFoodRate(String id) async {
     _isLoading = true;
@@ -45,12 +48,14 @@ class _ReviewState extends State<Review> {
         headers: headers,
         body: jsonEncode(jsonBody));
     debugPrint(response.statusCode.toString());
+    var dataUser = await SessionManager().get('info');
     if (response.statusCode == 200) {
       setState(() {
         var jsoncode = jsonDecode(response.body);
         for (var perRate in jsoncode) {
           listRating.add(Rate.fromJson(perRate));
         }
+        userInfo = User_Info.fromJson(dataUser);
         _isLoading = false;
       });
     } else {
@@ -75,6 +80,16 @@ class _ReviewState extends State<Review> {
     return _isLoading
         ? LoadingPage()
         : Scaffold(
+            floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.orange,
+                child: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Navigation(selectedIndex: 1)));
+                }),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             backgroundColor: Colors.white,
             body: SafeArea(
                 child: SingleChildScrollView(
@@ -156,7 +171,8 @@ class _ReviewState extends State<Review> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(50),
                                 image: DecorationImage(
-                                    image: AssetImage('images/avatar.png'),
+                                    image: AssetImage(
+                                        'images/avatar_${userInfo.avatarNum}.jpg'),
                                     fit: BoxFit.fitWidth),
                               )),
                           SizedBox(
@@ -207,7 +223,7 @@ class _ReviewState extends State<Review> {
                                                 BorderRadius.circular(50),
                                             image: DecorationImage(
                                                 image: AssetImage(
-                                                    'images/avatar.png'),
+                                                    'images/avatar_${listRating[i].userInfo![0].avatarNum}.jpg'),
                                                 fit: BoxFit.fitWidth),
                                           )),
                                       SizedBox(

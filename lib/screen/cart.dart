@@ -15,6 +15,7 @@ import 'package:uuid/uuid.dart';
 import 'package:location/location.dart';
 import 'package:geocode/geocode.dart';
 import 'package:food_app/screen/loading_page.dart' as ld;
+import 'package:flutter_paypal_checkout/flutter_paypal_checkout.dart';
 // import 'package:geocoding/geocoding.dart';
 
 class Cart extends StatefulWidget {
@@ -34,7 +35,7 @@ class _CartState extends State<Cart> {
   double sumPrice = 0;
   GeoCode geoCode = GeoCode();
   var uuid = Uuid();
-
+  int costCurrency = 0;
   @override
   void setState(fn) {
     if (mounted) {
@@ -148,7 +149,8 @@ class _CartState extends State<Cart> {
       });
     } else {
       setState(() {
-        _isLoading = true;
+        address = "Địa chỉ giao hàng....";
+        _isLoading = false;
       });
     }
     return response;
@@ -639,10 +641,91 @@ class _CartState extends State<Cart> {
                                               color: Colors.orange)))),
                               onPressed: () {
                                 // orderFood();
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => CheckoutPage()));
+                                costCurrency = (sumPrice / 24.34).round();
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      PaypalCheckout(
+                                    sandboxMode: true,
+                                    clientId:
+                                        "ASoa2JIh2a0Ji0o-tgbJHjPjP3vAEjBhtGQr5llpMvDogQKwA-xrIYd3hqKNQalk2Sk4zV_hmLyirLra",
+                                    secretKey:
+                                        "EM5jdjQDv0dIAfRaKCrtAK2uCiIuzUhQVwFmr9CaFwMaN5g_YKvcsgxXP_pJwTtldyJfcma1MU5uc5gZ",
+                                    returnURL: "success.snippetcoder.com",
+                                    cancelURL: "cancel.snippetcoder.com",
+                                    transactions: [
+                                      {
+                                        "amount": {
+                                          "total": "${costCurrency}",
+                                          "currency": "USD",
+                                          "details": {
+                                            "subtotal": "${costCurrency}",
+                                            "shipping": '0',
+                                            "shipping_discount": 0
+                                          }
+                                        },
+                                        "description":
+                                            "The payment transaction description.",
+                                        // "payment_options": {
+                                        //   "allowed_payment_method":
+                                        //       "INSTANT_FUNDING_SOURCE"
+                                        // },
+                                        // "item_list": {
+                                        //   "items": [
+                                        //     {
+                                        //       "name": "Apple",
+                                        //       "quantity": 4,
+                                        //       "price": '5000',
+                                        //       "currency": "JPY"
+                                        //     },
+                                        //     {
+                                        //       "name": "Pineapple",
+                                        //       "quantity": 5,
+                                        //       "price": '10000',
+                                        //       "currency": "JPY"
+                                        //     }
+                                        //   ],
+
+                                        // shipping address is not required though
+                                        //   "shipping_address": {
+                                        //     "recipient_name": "Raman Singh",
+                                        //     "line1": "Delhi",
+                                        //     "line2": "",
+                                        //     "city": "Delhi",
+                                        //     "country_code": "IN",
+                                        //     "postal_code": "11001",
+                                        //     "phone": "+00000000",
+                                        //     "state": "Texas"
+                                        //  },
+                                        // }
+                                      }
+                                    ],
+                                    note:
+                                        "Contact us for any questions on your order.",
+                                    onSuccess: (Map params) async {
+                                      orderFood();
+                                      Navigator.pop(context);
+                                      print("onSuccess: $params");
+                                      final snackBar = SnackBar(
+                                        content:
+                                            const Text('Đặt món thành công'),
+                                      );
+
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar);
+                                    },
+                                    onError: (error) {
+                                      print("onError: $error");
+                                      Navigator.pop(context);
+                                    },
+                                    onCancel: () {
+                                      print('cancelled:');
+                                    },
+                                  ),
+                                ));
+                                // Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) => CheckoutPage()));
                               },
                               child: Center(
                                   child: Text(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:food_app/models/cart_model.dart';
+import 'package:food_app/screen/nav_screen.dart';
 import 'package:food_app/screen/review.dart';
 import 'dart:convert';
 import 'dart:developer';
@@ -27,6 +29,7 @@ class _ProfileState extends State<Profile> {
 
   Future<void> logOut() async {
     await SessionManager().set("accessToken", '');
+    await SessionManager().set("cart", List_cart(cart: []));
     Navigator.push(context, MaterialPageRoute(builder: (context) => Default()));
   }
 
@@ -70,6 +73,16 @@ class _ProfileState extends State<Profile> {
     return _isLoading
         ? ld.LoadingPage()
         : Scaffold(
+            floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.orange,
+                child: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Navigation(selectedIndex: 1)));
+                }),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             backgroundColor: Colors.white,
             body: SingleChildScrollView(
               child: Container(
@@ -99,7 +112,8 @@ class _ProfileState extends State<Profile> {
                                   spreadRadius: 1.0),
                             ],
                             image: DecorationImage(
-                                image: AssetImage('images/avatar.png'),
+                                image: AssetImage(
+                                    'images/avatar_${userInfo.avatarNum}.jpg'),
                                 fit: BoxFit.fitWidth),
                           )),
                     ),
